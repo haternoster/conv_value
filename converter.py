@@ -1,12 +1,22 @@
+import urllib.request
+import json
 
-class ConverterInterface:
-    def convert(self, source, dest, amount):
-        pass
-
-class ConverterImpl(ConverterInterface):
+class Rate_Converter:
     def convert(self, source, dest, amount):
         return amount * self.get_rate(source, dest)
 
     def get_rate(self, source, dest):
-        return 0.5
+        source_rate = self.get_rub_rate(source)
+        dest_rate = self.get_rub_rate(dest)
+        return source_rate / dest_rate
 
+    def get_rub_rate(self, source):
+
+        if source == "RUB":
+            return 1
+
+        link = "https://www.cbr-xml-daily.ru/daily_json.js"
+
+        contents = urllib.request.urlopen(link).read()
+        parce_it = json.loads(contents)["Valute"][source.upper()]
+        return parce_it["Value"] / parce_it["Nominal"]
